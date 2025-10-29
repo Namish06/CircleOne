@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CircleOne - Alumni Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; }
+        header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; position: relative; }
+        header h1 { font-size: 24px; font-weight: normal; }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        .welcome-message { font-size: 28px; color: #2c3e50; margin-bottom: 40px; text-align: center; }
+        .button-container { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+        .nav-button { background-color: #3498db; color: white; padding: 15px 25px; text-decoration: none; text-align: center; border-radius: 5px; font-size: 16px; transition: background-color 0.3s; }
+        .nav-button:hover { background-color: #2980b9; }
+        #logoutBtn { background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; position: absolute; top: 15px; right: 20px; font-size: 14px; }
+        footer { background-color: #34495e; color: white; text-align: center; padding: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CircleOne – Alumni Platform</h1>
+        <button id="logoutBtn">Logout</button>
+    </header>
+
+    <main>
+        <div class="welcome-message">Welcome, ByteBenders!</div>
+        <div class="button-container">
+            <a href="alumni.html" class="nav-button">Alumni Directory</a>
+            <a href="events.html" class="nav-button">Events</a>
+            <a href="profile.html" class="nav-button">My Profile</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>Prototype Demo – Smart India Hackathon</p>
+    </footer>
+
+    <script>
+        (async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/validate');
+                if (response.status !== 200) {
+                   window.location.href = 'login.html'; 
+                   return;
+                }
+                const data = await response.json();
+                if (!data.success) {
+                    window.location.href = 'login.html'; 
+                }
+            } catch (error) {
+                window.location.href = 'login.html'; 
+				}
+        })();
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+            } finally {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

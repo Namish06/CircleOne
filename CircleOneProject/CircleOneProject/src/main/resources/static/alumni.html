@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Directory - CircleOne</title>
+    <style>
+		.data-card {
+		    background-color: #fff;
+		    padding: 20px;
+		    border-radius: 8px;
+		    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+		    border-left: 5px solid #3498db; 
+		    margin-bottom: 15px; 
+		    text-align: left;
+		}
+		.data-card h3 {
+		    color: #3498db;
+		    margin-bottom: 10px;
+		}
+		.data-card p {
+		    line-height: 1.5;
+		}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; }
+        header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
+        header h1 { font-size: 24px; font-weight: normal; }
+        main { flex: 1; padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+        .page-title { font-size: 28px; color: #2c3e50; margin-bottom: 20px; text-align: center; }
+        .action-button { background-color: #3498db; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-bottom: 20px; }
+        .back-link { background-color: #95a5a6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px; }
+        .result-area { margin-top: 20px; padding: 20px; background-color: white; border-radius: 5px; border: 1px solid #ddd; min-height: 100px; white-space: pre-wrap; word-wrap: break-word; }
+        .loading { color: #3498db; font-style: italic; }
+        .error { color: #e74c3c; }
+        footer { background-color: #34495e; color: white; text-align: center; padding: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CircleOne – Alumni Platform</h1>
+    </header>
+
+	<main>
+	    <h2 class="page-title">Alumni Directory</h2>
+	    
+	    <div id="result" class="result-area">
+	        <p>Loading alumni data...</p>
+	    </div>
+
+	    <div style="text-align: center;">
+	        <a href="index.html" class="back-link">← Back to Home</a>
+	    </div>
+	</main>
+
+    <footer>
+        <p>Prototype Demo – Smart India Hackathon</p>
+    </footer>
+
+    <script>
+       
+        (async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/validate');
+                if (response.status !== 200) {
+                   window.location.href = 'login.html';
+                   return;
+                }
+                const data = await response.json();
+				if (!data.success) {
+				    window.location.href = 'login.html';
+				} else {
+				    fetchAlumni();
+				}
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        async function fetchAlumni() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p class="loading">Loading alumni data...</p>';
+            
+            try {
+                const response = await fetch('/api/alumni');
+                if (response.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const data = await response.json();
+				const cardsHtml = data.map(alumnus => `
+				    <div class="data-card">
+				        <h3>${alumnus.name}</h3>
+				        <p><strong>Department:</strong> ${alumnus.department}</p>
+				        <p><strong>Graduation Year:</strong> ${alumnus.graduationYear}</p>
+				    </div>
+				`).join('');
+
+				resultDiv.innerHTML = cardsHtml;
+            } catch (error) {
+                resultDiv.innerHTML = '<p class="error">Network error. Could not fetch alumni data.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
